@@ -1,21 +1,44 @@
 "use client"
 import { useState } from 'react';
 import { TextField, Button, Container, Box } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
 import Link from 'next/link';
 
 const SignUpForm = () => {
+    const router = useRouter();
     const [data, setData] = useState({
-        name: "",
+        firstName: "",
+        lastName: "",
         email: "",
         password: "",
-        confirmPassword: ""
+        confirm_password: ""
 
     });
+const [alldata,setAlldata]=useState([])
+    const handleSubmit = async () => {
+        if (data.firstName.length > 1 && data.lastName.length > 1 && data.email.includes("@") && data.password.length > 1 && data.confirm_password.length > 1 && data.password === data.confirm_password) {
+            try {
+                const response = await axios.post("https://todo-api-xu4f.onrender.com/user/register", data);
+                console.log(response.data, "response");
+                alert(response.data.message);
+                router.push('/');
+            } catch (error) {
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log(data);
-        if (data.name.length < 5 && data.email.includes("@") && data.password.length < 5 && data.confirmPassword.length < 5 & data.password === data.confirmPassword) {
+                console.log(error.response.data);
+                if (error.response.data.message==="This email already exists") {
+                    alert(error.response.data.message)
+                   
+                } else {
+                    console.error(error);
+                    alert("Something went wrong");
+                }
+
+            }
+        } else {
+
+
+            alert("Something went wrong");
 
         }
     };
@@ -27,8 +50,17 @@ const SignUpForm = () => {
                 <TextField
                     label=" Full Name "
                     variant="outlined"
-                    value={data.name}
-                    onChange={(e) => setData(p => ({ ...p, name: e.target.value }))}
+                    value={data.firstName}
+                    onChange={(e) => setData(p => ({ ...p, firstName: e.target.value }))}
+                    fullWidth
+                    margin="normal"
+                    required
+                />
+                <TextField
+                    label=" Last Name "
+                    variant="outlined"
+                    value={data.lastName}
+                    onChange={(e) => setData(p => ({ ...p, lastName: e.target.value }))}
                     fullWidth
                     margin="normal"
                     required
@@ -57,8 +89,8 @@ const SignUpForm = () => {
                     label=" Enter confirm  Password"
                     variant="outlined"
                     type="password"
-                    value={data.confirmPassword}
-                    onChange={(e) => setData(p => ({ ...p, confirmPassword: e.target.value }))}
+                    value={data.confirm_password}
+                    onChange={(e) => setData(p => ({ ...p, confirm_password: e.target.value }))}
                     fullWidth
                     margin="normal"
                     required

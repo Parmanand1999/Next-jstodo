@@ -1,6 +1,6 @@
 "use client"
+import React, { useEffect, useState } from 'react'
 import { Box, Button, Container, TextField } from '@mui/material'
-import { useState } from 'react'
 import Navbar from '../components/Navbar'
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -9,25 +9,63 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { AiOutlineDelete } from 'react-icons/ai';
+import axios from 'axios';
 
 
 
-function todotask() {
-    const [taskdata, setTaskdata] = useState({
-        task: "",
+const TodoTask = () => {
+    const [task, setTask] = useState({
+        title: "",
         description: ""
     })
     const [data, setData] = useState([])
+    const token = localStorage.getItem("token")
 
 
-    function addtask() {
-        const updtate = [...data, taskdata]
-        setData(updtate)
-        setTaskdata({
-            task: "",
+    async function addtask() {
+        // const updtate = [...data, task]
+        // setData(updtate)
+        setTask({
+            title: "",
             description: ""
         })
+        try {
+            const response = await axios.post("https://todo-api-xu4f.onrender.com/user/addTodo", task, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            console.log(response, "responcetodo")
+            alert(response.data.message)
+
+
+        } catch (error) {
+            console.log(error)
+        }
+
+        try {
+            const responsealltodo = await axios.get("https://todo-api-xu4f.onrender.com/user/all-todo", {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            console.log(responsealltodo.data.AllTodo, "responcealltodo")
+            setData(responsealltodo.data.AllTodo)
+
+        } catch (error) {
+            console.log(error)
+        }
     }
+    useEffect(() => {
+        try {
+            const responsealltodo = axios.get("https://todo-api-xu4f.onrender.com/user/all-todo", {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            console.log(responsealltodo.data.AllTodo, "responcealltodo")
+            setData(responsealltodo.data.AllTodo)
+
+        } catch (error) {
+            console.log(error)
+        }
+    }, [token])
+
+
     const removeitem = (i) => {
         const newList = data.filter((item, id) => id !== i);
         setData(newList)
@@ -44,8 +82,8 @@ function todotask() {
                     fullWidth
                     margin="normal"
                     type='text'
-                    value={taskdata.task}
-                    onChange={(e) => setTaskdata(p => ({ ...p, task: e.target.value }))}
+                    value={task.title}
+                    onChange={(e) => setTask(p => ({ ...p, title: e.target.value }))}
                     label=" Enter Task here"
                     size="small"
                 />
@@ -54,8 +92,8 @@ function todotask() {
                     variant="outlined"
                     type="text"
                     fullWidth
-                    onChange={(e) => setTaskdata(p => ({ ...p, description: e.target.value }))}
-                    value={taskdata.description}
+                    onChange={(e) => setTask(p => ({ ...p, description: e.target.value }))}
+                    value={task.description}
                     margin="normal"
                     multiline
                     rows={3}
@@ -94,7 +132,7 @@ function todotask() {
                                 key={id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
-                                <TableCell component="th" scope="row">{item.task} </TableCell>
+                                <TableCell component="th" scope="row">{item.title} </TableCell>
                                 <TableCell align="center">{item.description}</TableCell>
 
                                 <TableCell align="right" >{<AiOutlineDelete color="red" onClick={() => removeitem(id)} />}</TableCell>
@@ -108,4 +146,4 @@ function todotask() {
     )
 }
 
-export default todotask
+export default TodoTask

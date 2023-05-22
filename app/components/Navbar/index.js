@@ -1,8 +1,16 @@
 "use client"
 import { Box, Button, Container } from '@mui/material'
 import { Link } from '@mui/material'
+import { useRouter } from 'next/navigation'
 
 function Navbar() {
+    const router=useRouter()
+    const loghandler = ()=>{
+        localStorage.removeItem("token")
+        if (!localStorage.getItem) {
+            router("/")
+        }
+    }
     return (
         <>
 
@@ -28,9 +36,10 @@ function Navbar() {
                     <Link href="/" >
                         <Button sx={{
                             borderBottom: 0,
-
                             background: "white"
-                        }} >Logout</Button>
+                        }}
+                            onClick={loghandler}
+                        >Logout</Button>
 
                     </Link>
                 </Box>
